@@ -10,8 +10,8 @@
 // ==========================================
 // 1. KONFIGURASI JARINGAN & PERANGKAT
 // ==========================================
-const char* ssid     = "Marcel"; 
-const char* password = "MC77866Y";    
+const char* ssid     = ""; 
+const char* password = "";    
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
