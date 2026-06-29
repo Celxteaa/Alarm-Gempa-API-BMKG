@@ -12,13 +12,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     
     <style>
-        /* Menerapkan font pixel art ke seluruh sistem */
         body {
             font-family: 'Press Start 2P', monospace;
             image-rendering: pixelated;
         }
-
-        /* Bingkai Tebal Khas Game Arkade Retro */
         .pixel-border {
             border: 4px solid #ffffff;
             box-shadow: 6px 6px 0px #000000;
@@ -27,8 +24,6 @@
             border: 4px solid #ef4444;
             box-shadow: 6px 6px 0px #7f1d1d;
         }
-
-        /* Animasi Berkedip Efek Teks Bahaya */
         @keyframes blink {
             0%, 49% { opacity: 1; }
             50%, 100% { opacity: 0; }
@@ -36,16 +31,12 @@
         .pixel-blink {
             animation: blink 1s infinite;
         }
-
-        /* Memastikan peta beradaptasi dengan gaya kaku kotak */
         #map {
             height: 250px;
             border: 4px solid #ffffff;
             box-shadow: 4px 4px 0px #000000;
             z-index: 1;
         }
-
-        /* Modifikasi Kotak Zoom Peta Leaflet Biar Kaku */
         .leaflet-bar {
             border: 3px solid #ffffff !important;
             box-shadow: 3px 3px 0px #000000 !important;
@@ -67,18 +58,12 @@
             </h1>
             <p class="text-[7px] text-zinc-400 mt-2 leading-relaxed">RADAR JATENG & DIY (300 KM)</p>
         </div>
-        
     </header>
 
     <main class="flex-1 my-4 max-w-md mx-auto w-full flex flex-col justify-center gap-4">
-        
         <div id="status-card" class="bg-neutral-900 pixel-border p-5 text-center transition-all duration-500">
             <h2 class="text-[8px] tracking-widest text-zinc-400 mb-3">> STATUS WILAYAH <</h2>
-            
-            <div id="status-text" class="text-sm font-bold text-emerald-400 mb-4 uppercase">
-                Menghubungkan...
-            </div>
-            
+            <div id="status-text" class="text-sm font-bold text-emerald-400 mb-4 uppercase">Menghubungkan...</div>
             <div class="border-b-4 border-dashed border-neutral-700 my-4"></div>
             
             <div class="grid grid-cols-2 gap-3 my-4 text-left text-[8px] leading-relaxed">
@@ -91,10 +76,11 @@
                     <span id="info-distance" class="text-white font-bold">-- KM</span>
                 </div>
             </div>
+            
             <h3 class="text-[8px] tracking-widest text-zinc-400 mb-3">JAM
-            <div id="status-time" class="text-[9px] bg-neutral-800 px-3 py-2 border-2 border-zinc-600 text-yellow-400 font-mono">
-                        --:--
-                    </div></h3>
+                <div id="status-time" class="text-[9px] bg-neutral-800 px-3 py-2 border-2 border-zinc-600 text-yellow-400 font-mono mt-1">--:--</div>
+            </h3>
+            
             <div class="bg-black p-3 border-2 border-zinc-700 text-left text-[8px] mb-3 leading-relaxed">
                 <span class="text-zinc-500 block text-[7px] mb-1">KOORDINAT (LAT, LON):</span>
                 <span id="info-coords" class="text-sky-400 font-bold">--, --</span>
@@ -119,7 +105,6 @@
                 [ AKTIFKAN FITUR KESELAMATAN ]
             </button>
         </div>
-
     </main>
 
     <footer class="p-3 border-2 border-zinc-800 text-center text-[6px] text-zinc-600 bg-neutral-950 tracking-wider">
@@ -130,26 +115,23 @@
     <script>
         lucide.createIcons();
 
-        // 1. KONFIGURASI GEOLOCK
-        const CENTROID_LAT = -7.3500; // Centroid Jateng-DIY
-        const CENTROID_LON = 110.2000; // Centroid Jateng-DIY
-        const RADIUS_MAX_KM = 300.0; // Radius Batas Aman
+        const CENTROID_LAT = -7.3500; 
+        const CENTROID_LON = 110.2000; 
+        const RADIUS_MAX_KM = 300.0; 
         const BMKG_URL = "https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json";
 
         let idGempaTerakhir = "";
         let audioContext = null;
         let map, gempaMarker, radarCircle;
 
-        // 2. INISIALISASI PETA AWAL
         function initMap() {
             map = L.map('map').setView([CENTROID_LAT, CENTROID_LON], 7);
             
-            // Menggunakan tema peta gelap pekat (Dark Matter) agar serasi dengan UI 8-bit hitam
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OSM & CARTO'
+            // Perbaikan URL Tile Server HTTPS yang aman untuk Vercel
+            L.tileLayer('https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; CARTO'
             }).addTo(map);
 
-            // Lingkaran jangkauan aman radar (menggunakan garis putus-putus ala radar militer retro)
             radarCircle = L.circle([CENTROID_LAT, CENTROID_LON], {
                 color: '#10b981',
                 fillColor: '#10b981',
@@ -160,35 +142,26 @@
             }).addTo(map);
         }
 
-        // 3. FORMULA HAVERSINE
         function hitungJarakKeWilayah(gempaLat, gempaLon) {
             const R = 6371.0;
             const dLat = (gempaLat - CENTROID_LAT) * Math.PI / 180.0;
             const dLon = (gempaLon - CENTROID_LON) * Math.PI / 180.0;
             const lat1 = CENTROID_LAT * Math.PI / 180.0;
             const lat2 = gempaLat * Math.PI / 180.0;
-
             const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
                       Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            
-            return R * c;
+            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
         }
 
-        // 4. AUDIO SIRINE DIGITAL
         function bunyikanSirineBencana(durasiDetik) {
             try {
                 if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 let osc = audioContext.createOscillator();
                 let gain = audioContext.createGain();
-                
-                
                 osc.type = 'square';
                 osc.frequency.setValueAtTime(2700, audioContext.currentTime);
-                
                 osc.connect(gain);
                 gain.connect(audioContext.destination);
-                
                 osc.start();
                 osc.stop(audioContext.currentTime + durasiDetik);
             } catch(e) {
@@ -196,62 +169,50 @@
             }
         }
 
-        // Ganti fungsi requestPermissions() lama Anda dengan blok kode di bawah ini:
+        const VAPID_PUBLIC_KEY = "BLXD2qts3xnM9EZ73HQMUayRRpPQWY66CtHCCXwm3JazboKPhLW5DMb5eVsLyOZ1XQ-ALKewOR8enKMZFPs8jXU"; 
 
-// Kunci VAPID Publik (Hasilkan sepasang kunci VAPID menggunakan command: npx web-push generate-vapid-keys)
-const VAPID_PUBLIC_KEY = "BLXD2qts3xnM9EZ73HQMUayRRpPQWY66CtHCCXwm3JazboKPhLW5DMb5eVsLyOZ1XQ-ALKewOR8enKMZFPs8jXU"; 
-
-function urlBase64ToUint8Array(base64String) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
-    const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-    for (let i = 0; i < rawData.length; ++i) {
-        outputArray[i] = rawData.charCodeAt(i);
-    }
-    return outputArray;
-}
-
-async function requestPermissions() {
-    // 1. Izin Audio Kontekstual Asli Anda
-    if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-    // 2. Izin Pendaftaran Push Background Sistem
-    if ("serviceWorker" in navigator && "PushManager" in window) {
-        try {
-            // Daftarkan file Service Worker di latar belakang
-            const registration = await navigator.serviceWorker.register('/sw.js');
-            
-            // Minta izin Push Notification ke pengguna
-            const permission = await Notification.requestPermission();
-            if (permission === "granted") {
-                
-                // Daftarkan HP pengguna ke Push Manager Browser
-                const subscribeOptions = {
-                    userVisibleOnly: true,
-                    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-                };
-                
-                const subscription = await registration.pushManager.subscribe(subscribeOptions);
-                
-                // Kirim data token HP ke Serverless Function Vercel untuk disimpan ke Supabase
-                await fetch('/api/subscribe', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(subscription)
-                });
-
-                alert("FITUR KESELAMATAN AKTIF: HP SIAP MENERIMA NOTIFIKASI BACKGROUND!");
-                document.getElementById('permission-box').classList.add('hidden');
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
             }
-        } catch (error) {
-            console.error("Gagal mendaftarkan Push Background:", error);
-            alert("Gagal mengaktifkan background push. Coba lagi.");
+            return outputArray;
         }
-    } else {
-        alert("Browser Anda belum mendukung push notification background.");
-    }
-}
+
+        async function requestPermissions() {
+            if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            if ("serviceWorker" in navigator && "PushManager" in window) {
+                try {
+                    // Pastikan service worker dipanggil dengan jalur relatif root Vercel yang valid
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    const permission = await Notification.requestPermission();
+                    if (permission === "granted") {
+                        const subscribeOptions = {
+                            userVisibleOnly: true,
+                            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+                        };
+                        const subscription = await registration.pushManager.subscribe(subscribeOptions);
+                        
+                        await fetch('/api/subscribe', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(subscription)
+                        });
+
+                        alert("FITUR KESELAMATAN AKTIF: HP SIAP MENERIMA NOTIFIKASI BACKGROUND!");
+                        document.getElementById('permission-box').classList.add('hidden');
+                    }
+                } catch (error) {
+                    console.error("Gagal mendaftarkan Push Background:", error);
+                    alert("Gagal mengaktifkan background push. Coba lagi.");
+                }
+            } else {
+                alert("Browser Anda belum mendukung push notification background.");
+            }
+        }
 
         function kirimPushNotification(title, body) {
             if ("Notification" in window && Notification.permission === "granted") {
@@ -263,16 +224,12 @@ async function requestPermissions() {
             }
         }
 
-        // 5. DATA FETCH & LOGIKA UPDATE PETA
         async function scanLogGempaBMKG() {
             try {
                 const response = await fetch(BMKG_URL + '?t=' + new Date().getTime());
                 const data = await response.json();
-                
                 const gempa = data.Infogempa.gempa;
-                const tanggal = gempa.Tanggal;
-                const waktu = gempa.Jam;
-                const idGempaSekarang = tanggal + "_" + waktu;
+                const idGempaSekarang = gempa.Tanggal + "_" + gempa.Jam;
 
                 let jamMenit = "--:--";
                 const posisiUnderscore = idGempaSekarang.indexOf('_');
@@ -293,26 +250,16 @@ async function requestPermissions() {
 
                     let wilayahSpesifik = wilayah;
                     const indeksKeyword = wilayahSpesifik.indexOf("km ");
-                    if (indeksKeyword !== -1) {
-                        wilayahSpesifik = wilayahSpesifik.substring(indeksKeyword + 3);
-                    }
-                    if (wilayahSpesifik.length > 25) {
-                        wilayahSpesifik = wilayahSpesifik.substring(0, 23) + "..";
-                    }
+                    if (indeksKeyword !== -1) wilayahSpesifik = wilayahSpesifik.substring(indeksKeyword + 3);
+                    if (wilayahSpesifik.length > 25) wilayahSpesifik = wilayahSpesifik.substring(0, 23) + "..";
 
                     const jarakKeLokasi = hitungJarakKeWilayah(gempaLat, gempaLon);
-
                     const wilayahLower = wilayah.toLowerCase();
-                    const sebutWilayahKita =    wilayahLower.includes("diy") || 
-                                                wilayahLower.includes("yogyakarta") || 
-                                                wilayahLower.includes("jawa tengah") ||
-                                                wilayahLower.includes("jateng") ||
-                                                wilayahLower.includes("bantul") ||
-                                                wilayahLower.includes("gunungkidul") ||
-                                                wilayahLower.includes("kulonprogo") ||
-                                                wilayahLower.includes("sleman");
+                    const sebutWilayahKita =    wilayahLower.includes("diy") || wilayahLower.includes("yogyakarta") || 
+                                                wilayahLower.includes("jawa tengah") || wilayahLower.includes("jateng") ||
+                                                wilayahLower.includes("bantul") || wilayahLower.includes("gunungkidul") ||
+                                                wilayahLower.includes("kulonprogo") || wilayahLower.includes("sleman");
 
-                    // Update UI Teks & Koordinat
                     const card = document.getElementById('status-card');
                     const statusText = document.getElementById('status-text');
                     
@@ -321,33 +268,23 @@ async function requestPermissions() {
                     document.getElementById('info-coords').innerText = `${gempaLat}, ${gempaLon}`;
                     document.getElementById('info-loc').innerText = wilayahSpesifik.toUpperCase();
 
-                    // RE-POSITIONING MARKER PETA DAN UPDATE WARNA RADAR
                     if (gempaMarker) map.removeLayer(gempaMarker);
-                    
                     gempaMarker = L.marker([gempaLat, gempaLon]).addTo(map)
                         .bindPopup(`<b>[!] GEMPA</b><br>M: ${magnitudo} SR<br>LOC: ${wilayahSpesifik.toUpperCase()}`).openPopup();
-                    
                     map.setView([gempaLat, gempaLon], 7);
 
                     if (jarakKeLokasi <= RADIUS_MAX_KM || sebutWilayahKita) {
                         card.className = "bg-neutral-900 pixel-border-red p-5 text-center transition-all duration-500 ring-4 ring-red-600 animate-pulse";
                         statusText.innerText = "[!!] AWAS GEMPA! [!!]";
                         statusText.className = "text-xs font-extrabold text-red-500 mb-4 pixel-blink";
-
                         radarCircle.setStyle({ color: '#ef4444', fillColor: '#ef4444' });
 
                         kirimPushNotification("PERINGATAN DINI GEMPA", `M: ${magnitudo} SR | Jarak: ${Math.round(jarakKeLokasi)}KM. Pusat: ${wilayahSpesifik}`);
-
-                        if (magnitudo >= 5.0) {
-                            bunyikanSirineBencana(15);
-                        } else {
-                            bunyikanSirineBencana(5); 
-                        }
+                        bunyikanSirineBencana(magnitudo >= 5.0 ? 15 : 5);
                     } else {
                         card.className = "bg-neutral-900 pixel-border p-5 text-center transition-all duration-500";
                         statusText.innerText = "STATUS: AMAN";
                         statusText.className = "text-xs font-extrabold text-emerald-400 mb-4 uppercase";
-                        
                         radarCircle.setStyle({ color: '#10b981', fillColor: '#10b981' });
                     }
                 }
@@ -358,10 +295,9 @@ async function requestPermissions() {
             }
         }
 
-        // Jalankan program setelah dokumen siap
         initMap();
         scanLogGempaBMKG();
-        setInterval(scanLogGempaBMKG, 60000); // Sinkronisasi otomatis setiap 1 menit
+        setInterval(scanLogGempaBMKG, 60000);
     </script>
 </body>
 </html>
