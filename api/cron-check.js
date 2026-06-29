@@ -51,7 +51,7 @@ export default async function handler(req, res) {
         const magnitudo = parseFloat(gempa.Magnitude);
         const wilayah = gempa.Wilayah;
 
-        const jarak = hitungHaversineBackend(gempaLat, gem_elon);
+        const jarak = hitungHaversineBackend(gempaLat, gempaLon);
         const wilayahLower = wilayah.toLowerCase();
         
         // Pendeteksi teks wilayah darurat lokal Anda
