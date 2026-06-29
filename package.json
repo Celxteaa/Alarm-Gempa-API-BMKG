@@ -1,5 +1,10 @@
 {
+  "name": "alarm-gempa-jateng-diy",
+  "version": "1.0.0",
+  "type": "module",
   "dependencies": {
     "dotenv": "^17.4.2"
+    "@supabase/supabase-js": "^2.39.0",
+    "web-push": "^3.6.6"
   }
 }
