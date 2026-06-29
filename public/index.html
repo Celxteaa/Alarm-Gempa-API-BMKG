@@ -12,13 +12,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     
     <style>
-        /* Menerapkan font pixel art ke seluruh sistem */
+        
         body {
             font-family: 'Press Start 2P', monospace;
             image-rendering: pixelated;
         }
 
-        /* Bingkai Tebal Khas Game Arkade Retro */
+        
         .pixel-border {
             border: 4px solid #ffffff;
             box-shadow: 6px 6px 0px #000000;
@@ -37,7 +37,7 @@
             animation: blink 1s infinite;
         }
 
-        /* Memastikan peta beradaptasi dengan gaya kaku kotak */
+        
         #map {
             height: 250px;
             border: 4px solid #ffffff;
@@ -149,7 +149,7 @@
                 attribution: '&copy; OSM & CARTO'
             }).addTo(map);
 
-            // Lingkaran jangkauan aman radar (menggunakan garis putus-putus ala radar militer retro)
+            // Lingkaran jangkauan aman radar 
             radarCircle = L.circle([CENTROID_LAT, CENTROID_LON], {
                 color: '#10b981',
                 fillColor: '#10b981',
@@ -196,7 +196,7 @@
             }
         }
 
-        // Ganti fungsi requestPermissions() lama Anda dengan blok kode di bawah ini:
+       
 
 // Kunci VAPID Publik (Hasilkan sepasang kunci VAPID menggunakan command: npx web-push generate-vapid-keys)
 const VAPID_PUBLIC_KEY = "BLXD2qts3xnM9EZ73HQMUayRRpPQWY66CtHCCXwm3JazboKPhLW5DMb5eVsLyOZ1XQ-ALKewOR8enKMZFPs8jXU"; 
@@ -348,7 +348,7 @@ async function requestPermissions() {
             }
         }
 
-        // Jalankan program setelah dokumen siap
+        
         initMap();
         scanLogGempaBMKG();
         setInterval(scanLogGempaBMKG, 60000); // Sinkronisasi otomatis setiap 1 menit
